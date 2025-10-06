@@ -1,0 +1,5 @@
+streamlit
+speechrecognition
+pyaudio
+gtts
+playsound
