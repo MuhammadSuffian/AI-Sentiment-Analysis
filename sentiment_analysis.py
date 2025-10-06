@@ -59,7 +59,7 @@ def analyze_sentiment_and_get_llm_response(text):
                     "content": prompt
                 }
             ],
-            model="qwen-qwq-32b",
+            model="openai/gpt-oss-120b",
             temperature=0.7,
             max_tokens=1024,
         )
