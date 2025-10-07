@@ -2,6 +2,7 @@ import streamlit as st
 import speech_recognition as sr
 from textblob import TextBlob
 import os
+import html
 import tempfile
 from groq import Groq
 import json
@@ -19,6 +20,28 @@ except Exception as e:
     st.stop()
 
 st.title("🎙️ Voice Sentiment Analyzer")
+
+# Simple chat-bubble CSS reused from the sample UI so responses look like chat bubbles
+st.markdown("""
+<style>
+/* Chat bubbles */
+.user-message { background: #e3f2fd; color: #1976d2; padding: 8px 12px; border-radius: 18px 18px 4px 18px; margin: 8px 0 8px auto; max-width: 80%; display:block; text-align:right; }
+.ai-message { background: #f5f5f5; color: #333; padding: 8px 12px; border-radius: 18px 18px 18px 4px; margin: 8px auto 8px 0; max-width: 80%; display:block; }
+/* Keep pre content inside bubbles readable */
+.ai-message pre, .user-message pre { margin:0; white-space: pre-wrap; font-family: inherit; }
+</style>
+""", unsafe_allow_html=True)
+
+def render_user_message(text: str):
+    # Escape HTML and display inside a user bubble
+    safe = html.escape(text or "")
+    st.markdown(f'<div class="user-message"><pre>{safe}</pre></div>', unsafe_allow_html=True)
+
+def render_ai_message(text: str):
+    # Text is expected to be pre-formatted (markdown-like). Escape to avoid raw HTML executing,
+    # but preserve newlines via <pre> with pre-wrap so formatting is readable like the sample.
+    safe = html.escape(text or "")
+    st.markdown(f'<div class="ai-message"><pre>{safe}</pre></div>', unsafe_allow_html=True)
 
 # Create tabs for different input methods
 tab1, tab2 = st.tabs(["Upload Audio", "Record Live Audio"])
@@ -42,10 +65,6 @@ def format_llm_response(text: str) -> str:
     """
     # Normalize newlines
     text = text.replace('\r\n', '\n').replace('\r', '\n')
-
-    # Ensure any inline '###' headings are moved to their own line
-    # If '###' is not already at the start of a line, insert a newline before it
-    text = re.sub(r'(?<!\n)(?=###)', '\n', text)
 
     lines = text.split('\n')
     out_lines = []
@@ -158,13 +177,11 @@ def analyze_sentiment_and_get_llm_response(text):
             temperature=0.7,
             max_tokens=1024,
         )
-
+        
         llm_response = chat_completion.choices[0].message.content
         # Clean the response to remove any think tags
         cleaned_response = clean_response(llm_response)
-        # Format the cleaned response for display (preserve tables/code blocks and paragraph spacing)
-        formatted = format_llm_response(cleaned_response)
-        return sentiment, sentiment_label, formatted
+        return sentiment, sentiment_label, cleaned_response
     except Exception as e:
         st.error(f"Error getting LLM response: {str(e)}")
         return sentiment, sentiment_label, None
