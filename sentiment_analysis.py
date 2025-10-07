@@ -108,7 +108,7 @@ with tab1:
 
                 st.subheader("Sentiment Analysis Result")
                 # Display colored badge (HTML) and numeric score
-                st.markdown(f"**Sentiment:** {sentiment_label}    \n**Score:** {sentiment:.2f}", unsafe_allow_html=True)
+                st.markdown(f"**Sentiment:** {sentiment_label}  \n**Score:** {sentiment:.2f}", unsafe_allow_html=True)
                 
                 if llm_response:
                     st.subheader("AI Response")
