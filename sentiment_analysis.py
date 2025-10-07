@@ -112,7 +112,8 @@ with tab1:
                 
                 if llm_response:
                     st.subheader("AI Response")
-                    st.write(llm_response)
+                    # Render LLM output as markdown/HTML so formatting is preserved
+                    st.markdown(llm_response, unsafe_allow_html=True)
 
             except sr.UnknownValueError:
                 st.error("Could not understand audio.")
@@ -156,7 +157,8 @@ with tab2:
                     
                     if llm_response:
                         st.subheader("AI Response")
-                        st.write(llm_response)
+                        # Render LLM output as markdown/HTML so formatting is preserved
+                        st.markdown(llm_response, unsafe_allow_html=True)
 
                 except sr.UnknownValueError:
                     st.error("Could not understand audio.")
