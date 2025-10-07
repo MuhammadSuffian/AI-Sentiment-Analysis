@@ -36,7 +36,17 @@ def analyze_sentiment_and_get_llm_response(text):
     # Sentiment analysis
     blob = TextBlob(text)
     sentiment = blob.sentiment.polarity
-    sentiment_label = "Positive" if sentiment > 0 else "Negative" if sentiment < 0 else "Neutral"
+    # Determine textual label and badge color
+    sentiment_text = "Positive" if sentiment > 0 else "Negative" if sentiment < 0 else "Neutral"
+    badge_color = "#16a34a" if sentiment > 0 else "#dc2626" if sentiment < 0 else "#ffffff"
+    # Choose a readable text color for the badge
+    text_color = "#ffffff" if sentiment != 0 else "#000000"
+    # Create a small rounded badge using inline HTML/CSS
+    sentiment_label = (
+        f'<span style="background:{badge_color}; color:{text_color}; '
+        f'padding:4px 10px; border-radius:12px; border:1px solid #e5e7eb; '
+        f'font-weight:600">{sentiment_text}</span>'
+    )
     
     # Generate LLM response based on sentiment
     prompt = f"""
@@ -95,9 +105,10 @@ with tab1:
 
                 # Get sentiment analysis and LLM response
                 sentiment, sentiment_label, llm_response = analyze_sentiment_and_get_llm_response(text)
-                
+
                 st.subheader("Sentiment Analysis Result")
-                st.metric(label="Sentiment", value=sentiment_label, delta=f"{sentiment:.2f}")
+                # Display colored badge (HTML) and numeric score
+                st.markdown(f"**Sentiment:** {sentiment_label}  \\  \n**Score:** {sentiment:.2f}", unsafe_allow_html=True)
                 
                 if llm_response:
                     st.subheader("AI Response")
@@ -138,9 +149,10 @@ with tab2:
 
                     # Get sentiment analysis and LLM response
                     sentiment, sentiment_label, llm_response = analyze_sentiment_and_get_llm_response(text)
-                    
+
                     st.subheader("Sentiment Analysis Result")
-                    st.metric(label="Sentiment", value=sentiment_label, delta=f"{sentiment:.2f}")
+                    # Display colored badge (HTML) and numeric score
+                    st.markdown(f"**Sentiment:** {sentiment_label}  \\  \n**Score:** {sentiment:.2f}", unsafe_allow_html=True)
                     
                     if llm_response:
                         st.subheader("AI Response")
