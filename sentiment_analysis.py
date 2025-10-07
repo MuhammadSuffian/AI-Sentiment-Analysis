@@ -158,13 +158,13 @@ def analyze_sentiment_and_get_llm_response(text):
             temperature=0.7,
             max_tokens=1024,
         )
-        
-    llm_response = chat_completion.choices[0].message.content
-    # Clean the response to remove any think tags
-    cleaned_response = clean_response(llm_response)
-    # Format the cleaned response for display (preserve tables/code blocks and paragraph spacing)
-    formatted = format_llm_response(cleaned_response)
-    return sentiment, sentiment_label, formatted
+
+        llm_response = chat_completion.choices[0].message.content
+        # Clean the response to remove any think tags
+        cleaned_response = clean_response(llm_response)
+        # Format the cleaned response for display (preserve tables/code blocks and paragraph spacing)
+        formatted = format_llm_response(cleaned_response)
+        return sentiment, sentiment_label, formatted
     except Exception as e:
         st.error(f"Error getting LLM response: {str(e)}")
         return sentiment, sentiment_label, None
