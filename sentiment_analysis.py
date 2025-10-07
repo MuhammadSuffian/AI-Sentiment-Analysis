@@ -43,6 +43,10 @@ def format_llm_response(text: str) -> str:
     # Normalize newlines
     text = text.replace('\r\n', '\n').replace('\r', '\n')
 
+    # Ensure any inline '###' headings are moved to their own line
+    # If '###' is not already at the start of a line, insert a newline before it
+    text = re.sub(r'(?<!\n)(?=###)', '\n', text)
+
     lines = text.split('\n')
     out_lines = []
     i = 0
@@ -155,10 +159,12 @@ def analyze_sentiment_and_get_llm_response(text):
             max_tokens=1024,
         )
         
-        llm_response = chat_completion.choices[0].message.content
-        # Clean the response to remove any think tags
-        cleaned_response = clean_response(llm_response)
-        return sentiment, sentiment_label, cleaned_response
+    llm_response = chat_completion.choices[0].message.content
+    # Clean the response to remove any think tags
+    cleaned_response = clean_response(llm_response)
+    # Format the cleaned response for display (preserve tables/code blocks and paragraph spacing)
+    formatted = format_llm_response(cleaned_response)
+    return sentiment, sentiment_label, formatted
     except Exception as e:
         st.error(f"Error getting LLM response: {str(e)}")
         return sentiment, sentiment_label, None
