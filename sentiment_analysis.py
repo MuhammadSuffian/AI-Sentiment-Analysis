@@ -32,6 +32,87 @@ def clean_response(response):
     cleaned_response = ' '.join(cleaned_response.split())
     return cleaned_response
 
+
+def format_llm_response(text: str) -> str:
+    """Format LLM output for Streamlit display:
+    - Preserve fenced code blocks unchanged
+    - Preserve markdown tables as contiguous blocks and ensure a blank line before/after a table
+    - Preserve list items (no blank lines inserted between list items)
+    - For normal lines, insert a blank line after single newlines so paragraphs are separated
+    """
+    # Normalize newlines
+    text = text.replace('\r\n', '\n').replace('\r', '\n')
+
+    lines = text.split('\n')
+    out_lines = []
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        stripped = line.strip()
+
+        # Fenced code block: copy until closing fence unchanged
+        if stripped.startswith('```'):
+            if out_lines and out_lines[-1] != '':
+                out_lines.append('')
+            out_lines.append(line)
+            i += 1
+            while i < len(lines):
+                out_lines.append(lines[i])
+                if lines[i].strip().startswith('```'):
+                    i += 1
+                    break
+                i += 1
+            if out_lines and out_lines[-1] != '':
+                out_lines.append('')
+            continue
+
+        # Markdown table detection: contiguous lines containing a pipe '|' are treated as a table block
+        if '|' in line and not stripped.startswith(('-', '*', '+')):
+            # Collect contiguous pipe lines
+            if out_lines and out_lines[-1] != '':
+                out_lines.append('')
+            j = i
+            while j < len(lines) and '|' in lines[j]:
+                out_lines.append(lines[j])
+                j += 1
+            if out_lines and out_lines[-1] != '':
+                out_lines.append('')
+            i = j
+            continue
+
+        # Lists (bulleted or numbered) — preserve line breaks between items
+        if re.match(r"^\s*([-*+]\s+|\d+\.\s+)", line):
+            out_lines.append(line)
+            i += 1
+            continue
+
+        # Headings — keep and add a blank line after
+        if stripped.startswith('#'):
+            out_lines.append(line)
+            if out_lines and out_lines[-1] != '':
+                out_lines.append('')
+            i += 1
+            continue
+
+        # Empty line — preserve a single empty line
+        if stripped == '':
+            if not out_lines or out_lines[-1] != '':
+                out_lines.append('')
+            i += 1
+            continue
+
+        # Regular paragraph line — append and ensure a blank line after to create paragraph spacing
+        out_lines.append(line)
+        if out_lines and out_lines[-1] != '':
+            out_lines.append('')
+        i += 1
+
+    # Join and strip trailing whitespace/newlines
+    formatted = '\n'.join(out_lines)
+    # Collapse more than two consecutive newlines into two
+    formatted = re.sub(r'\n{3,}', '\n\n', formatted)
+    return formatted.strip() + '\n'
+
 def analyze_sentiment_and_get_llm_response(text):
     # Sentiment analysis
     blob = TextBlob(text)
