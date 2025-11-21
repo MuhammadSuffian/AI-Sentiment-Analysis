@@ -2,6 +2,10 @@
 
 A simple Streamlit app that transcribes audio, performs sentiment analysis using TextBlob, and returns an LLM-driven empathetic response via the Groq client.
 
+## Live Demo
+
+https://github.com/MuhammadSuffian/AI-Study-Buddy
+
 **Files**
 - `sentiment_analysis.py`: main Streamlit app.
 - `requirements.txt`: Python dependencies.
