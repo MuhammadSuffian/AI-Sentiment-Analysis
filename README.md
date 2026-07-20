@@ -4,7 +4,7 @@ A simple Streamlit app that transcribes audio, performs sentiment analysis using
 
 ## Live Demo
 
-https://github.com/MuhammadSuffian/AI-Study-Buddy
+[https://github.com/MuhammadSuffian/AI-Study-Buddy](https://ai-sentiment-analysisgit.streamlit.app/)
 
 **Files**
 - `sentiment_analysis.py`: main Streamlit app.
